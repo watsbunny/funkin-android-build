@@ -149,7 +149,7 @@ haxelib run lime build android -debug
 | --- | --- |
 | `haxelib run lime build android -debug` | debug APK |
 | `haxelib run lime build android` | release APK |
-| `haxelib run lime build android -Dandroid-arch=arm64` | только arm64 |
+| `haxelib run lime build android -arm64` | только arm64 |
 | `haxelib run lime build android -clean` | полная пересборка |
 | `haxelib run lime test android` | собрать, установить и запустить на телефоне |
 

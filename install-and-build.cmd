@@ -44,8 +44,8 @@ if /i "%~1"=="--release"    set "DO_RELEASE=1"
 if /i "%~1"=="--skip-build" set "DO_BUILD=0"
 if /i "%~1"=="--force"      set "DO_FORCE=1"
 if /i "%~1"=="--nopause"    set "NOPAUSE=1"
-if /i "%~1"=="--arch=arm64" set "LIME_EXTRA=!LIME_EXTRA! -Dandroid-arch=arm64"
-if /i "%~1"=="--arch=armv7" set "LIME_EXTRA=!LIME_EXTRA! -Dandroid-arch=armv7"
+if /i "%~1"=="--arch=arm64" set "LIME_EXTRA=!LIME_EXTRA! -arm64"
+if /i "%~1"=="--arch=armv7" set "LIME_EXTRA=!LIME_EXTRA! -armv7"
 if /i "%~1"=="--help"       goto usage
 if /i "%~1"=="-h"           goto usage
 shift
@@ -287,8 +287,10 @@ rem ------------------------ 6. lime + gradle config -------------------
 echo [6/9] Configuring Lime and Gradle ...
 set "LIME_CFG=%USERPROFILE%\.lime\config.xml"
 set "LIME_XML=<?xml version='1.0' encoding='utf-8'?><config><section id='defines'><define name='ANDROID_SDK' value='%SDK%'/><define name='ANDROID_NDK_ROOT' value='%NDK%'/><define name='JAVA_HOME' value='%JAVA_HOME_USED%'/></section><define name='ANDROID_SETUP' value='true'/></config>"
+rem Lime prefers ~/.lime/config.xml over environment variables, so the file must
+rem point at THIS toolchain, otherwise an older Lime config elsewhere is used.
 set "LIME_NEEDS=1"
-if exist "%LIME_CFG%" findstr /c:"ANDROID_SDK" "%LIME_CFG%" >nul 2>&1
+if exist "%LIME_CFG%" findstr /c:"%SDK%" "%LIME_CFG%" >nul 2>&1
 if not errorlevel 1 set "LIME_NEEDS=0"
 if "%LIME_NEEDS%"=="1" (
   if not exist "%USERPROFILE%\.lime" mkdir "%USERPROFILE%\.lime" 2>nul
@@ -383,7 +385,7 @@ if "%PERSIST%"=="1" (
   echo  Toolchain: %ROOT%
   echo  Helper   : %ROOT%\env.cmd   ^(call it to reuse the toolchain in a shell^)
 ) else (
-  echo  Portable mode - user environment was not modified.
+  echo  Portable mode - shell environment left untouched ^(Gradle heap is still set in %%USERPROFILE%%\.gradle^).
 )
 echo =====================================================================
 if "%NOPAUSE%"=="0" pause
