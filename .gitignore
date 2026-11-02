@@ -4,3 +4,4 @@ export/
 .gradle/
 *.log
 signing.properties
+_*.hxml
