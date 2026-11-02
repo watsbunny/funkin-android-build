@@ -158,16 +158,23 @@ copy /y "%LOCALAPPDATA%\FunkinAndroidToolchain\haxelib\flixel\4,8,1\flixel\math\
    -alias funkin -keyalg RSA -keysize 2048 -validity 10000
 ```
 
-Создайте `export\release\android\bin\signing.properties`:
+Создайте `export\release\android\bin\app\signing.properties` (именно в
+подпапке `app` и с такими именами ключей — Lime читает их так):
 
 ```properties
 KEY_STORE=C:/path/funkin.keystore
 KEY_STORE_PASSWORD=ваш_пароль
-KEY_ALIAS=funkin
-KEY_ALIAS_PASSWORD=ваш_пароль
+KEY_STORE_ALIAS=funkin
+KEY_STORE_ALIAS_PASSWORD=ваш_пароль
 ```
 
-Затем запустите `install-and-build.cmd --release`.
+Затем запустите `install-and-build.cmd --release`. Подписанный файл появится в
+`export\release\android\bin\app\build\outputs\apk\release\Funkin-release.apk`.
+
+Lime 8.3.2 выбирает Gradle-задачу по наличию keystore, а не по типу сборки,
+поэтому для release нужно ещё выставить
+`set ANDROID_GRADLE_TASK=assembleRelease` перед вызовом Lime (оба скрипта
+делают это сами).
 
 ---
 

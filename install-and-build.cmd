@@ -385,9 +385,13 @@ if "%DO_BUILD%"=="0" (
 echo [9/9] Building the APK - the first build takes 30-40 minutes ...
 echo.
 cd /d "%BUILDDIR%"
+rem Lime chooses the Gradle task from the keystore, not from the build type:
+rem force it, otherwise a "release" build still runs assembleDebug.
 if "%DO_RELEASE%"=="1" (
+  set "ANDROID_GRADLE_TASK=assembleRelease"
   call haxelib run lime build android !LIME_EXTRA!
 ) else (
+  set "ANDROID_GRADLE_TASK=assembleDebug"
   call haxelib run lime build android -debug !LIME_EXTRA!
 )
 set "RC=!ERRORLEVEL!"
