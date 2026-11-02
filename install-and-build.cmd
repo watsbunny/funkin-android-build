@@ -249,12 +249,28 @@ if not exist "%SDK%\cmdline-tools\latest\bin\sdkmanager.bat" (
   goto fail
 )
 set "SDKMGR=%SDK%\cmdline-tools\latest\bin\sdkmanager.bat"
+rem sdkmanager reads the licence answers from stdin. A pipe does not reach it
+rem reliably from a batch file, so feed the answers from a temporary file.
+set "YESFILE=%LOGDIR%\sdk-yes.txt"
+( for /l %%i in (1,1,200) do @echo y ) > "%YESFILE%"
 echo   Accepting SDK licenses...
-( for /l %%i in (1,1,80) do @echo y ) | call "%SDKMGR%" --sdk_root="%SDK%" --licenses >nul 2>&1
+call "%SDKMGR%" --sdk_root="%SDK%" --licenses < "%YESFILE%" >"%LOGDIR%\sdkmanager-licenses.log" 2>&1
 echo   Installing platform-tools, build-tools 34/35, platform android-35 ...
-call "%SDKMGR%" --sdk_root="%SDK%" "platform-tools" "platforms;android-35" "build-tools;34.0.0" "build-tools;35.0.0" >"%LOGDIR%\sdkmanager.log" 2>&1
+call "%SDKMGR%" --sdk_root="%SDK%" "platform-tools" "platforms;android-35" "build-tools;34.0.0" "build-tools;35.0.0" < "%YESFILE%" >"%LOGDIR%\sdkmanager.log" 2>&1
+del "%YESFILE%" 2>nul
+rem sdkmanager can exit with code 0 while silently skipping packages whose
+rem licences were not accepted - verify the result instead of trusting it.
+if not exist "%SDK%\platform-tools\adb.exe" (
+  echo   [ERROR] platform-tools were not installed - see "%LOGDIR%\sdkmanager.log"
+  goto fail
+)
+if not exist "%SDK%\platforms\android-35\android.jar" (
+  echo   [ERROR] platforms;android-35 was not installed - see "%LOGDIR%\sdkmanager.log"
+  goto fail
+)
+dir /b /a:d "%SDK%\build-tools" 2>nul | findstr /r "." >nul
 if errorlevel 1 (
-  echo   [ERROR] sdkmanager failed - see "%LOGDIR%\sdkmanager.log"
+  echo   [ERROR] build-tools were not installed - see "%LOGDIR%\sdkmanager.log"
   goto fail
 )
 if not exist "%NDK%\source.properties" (
@@ -375,6 +391,7 @@ if not "!RC!"=="0" (
 
 :done
 if "%PERSIST%"=="1" call :write_env
+if exist "%DL%" rmdir /s /q "%DL%" 2>nul
 echo =====================================================================
 echo  DONE
 echo =====================================================================
