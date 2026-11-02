@@ -1,31 +1,41 @@
 # Friday Night Funkin' — Android build
 
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+[![Download APK](https://img.shields.io/github/v/release/watsbunny/funkin-android-build?label=download%20APK)](https://github.com/watsbunny/funkin-android-build/releases)
 
 Friday Night Funkin' **0.2.7.1.5** (HaxeFlixel / Lime / OpenFL) for Android,
 packaged together with a **one-command Windows toolchain**.
 
-> **EN — why this repo exists.** Compiling an FNF build on Windows is a known
-> pain: exact Haxe/Neko/haxelib versions, Android SDK + NDK r21e, a JDK, a flixel
-> 4.8.1 that no longer compiles on modern Haxe, Gradle dying on a 170 MB APK and
-> refusing non-ASCII project paths. This repository exists **to spare you that
-> pain** when building and modding FNF: clone it, run `install-and-build.cmd`
-> once, get an APK and a reusable toolchain that stays on your machine.
-
-> **RU — зачем этот репозиторий.** Собрать FNF-сборку на Windows — отдельная
-> боль: точные версии Haxe/Neko/haxelib, Android SDK и NDK r21e, JDK, flixel
-> 4.8.1, который не собирается новым Haxe, Gradle, падающий на APK в 170 МБ, и
-> путь к проекту, который Gradle отказывается принимать. Этот репозиторий нужен,
-> **чтобы избавить вас от этой боли** при сборке и моддинге FNF: скачали, один
-> раз запустили `install-and-build.cmd` — получили APK и готовый инструментарий,
-> который остаётся на компьютере для следующих сборок и модов.
+**English** &nbsp;·&nbsp; [Русский](README.ru.md)
 
 ---
 
-## Быстрый старт
+## Why this repository exists
 
-Нужен Windows 10/11 x64, интернет и ~8 ГБ свободного места.
-Права администратора **не** требуются.
+Compiling an FNF build on Windows is a well-known pain: exact Haxe/Neko/haxelib
+versions, Android SDK + NDK r21e, a JDK, flixel 4.8.1 that no longer compiles on
+modern Haxe, Gradle dying on a 170 MB APK and refusing non-ASCII project paths.
+
+This repository exists **to spare you that pain** — both for simply building the
+game and for modding FNF: clone it, run `install-and-build.cmd` once, and you get
+an APK plus a complete, reusable toolchain that stays on your machine for the
+next build or mod.
+
+---
+
+## Download a ready APK
+
+Grab `Funkin-<version>-android.apk` from
+[**Releases**](https://github.com/watsbunny/funkin-android-build/releases), allow
+installation from unknown sources on the phone and install it.
+Android 5.0+ (minSdk 21), `arm64-v8a` and `armeabi-v7a`.
+
+---
+
+## Quick start (build it yourself)
+
+Needs Windows 10/11 x64, internet and ~8 GB of free disk. **No administrator
+rights required.**
 
 ```bat
 git clone https://github.com/watsbunny/funkin-android-build.git
@@ -33,46 +43,45 @@ cd funkin-android-build
 install-and-build.cmd
 ```
 
-Скрипт сам:
+The script:
 
-1. проверит curl / PowerShell / интернет;
-2. найдёт JDK 17+ (или скачает Eclipse Temurin JDK 21);
-3. поставит Haxe 4.3.7 + haxelib + Neko 2.4.1;
-4. поставит нужные haxelib-библиотеки;
-5. поставит Android SDK (cmdline-tools, platform-tools, build-tools 34/35,
-   `platforms;android-35`) и NDK r21e;
-6. настроит Lime (`~/.lime/config.xml`) и поднимет память Gradle;
-7. пропатчит flixel 4.8.1;
-8. обойдёт проблему с русскими буквами в пути;
-9. соберёт APK.
+1. checks curl / PowerShell / internet;
+2. finds JDK 17+ (or downloads Eclipse Temurin JDK 21);
+3. installs Haxe 4.3.7 + haxelib + Neko 2.4.1;
+4. installs the required haxelib libraries;
+5. installs the Android SDK (cmdline-tools, platform-tools, build-tools 34/35,
+   `platforms;android-35`) and NDK r21e;
+6. configures Lime (`~/.lime/config.xml`) and raises the Gradle heap;
+7. patches flixel 4.8.1;
+8. works around non-ASCII characters in the project path;
+9. builds the APK.
 
-Первый раз — **30–40 минут**, повторные сборки — 1–2 минуты.
+First run takes **30–40 minutes**, later builds **1–2 minutes**.
 
-### Готовый APK
+### Output
 
 ```
-export\debug\android\bin\app\build\outputs\apk\debug\*.apk
+export\debug\android\bin\app\build\outputs\apk\debug\*.apk      (debug)
+export\release\android\bin\app\build\outputs\apk\release\*.apk  (release)
 ```
 
-Установка на телефон (включите «Отладка по USB»):
+Install on the phone (enable "USB debugging" first):
 
 ```bat
 adb install -r "export\debug\android\bin\app\build\outputs\apk\debug\Funkin-debug.apk"
 ```
 
-### Флаги установщика
+### Installer flags
 
-| Флаг | Что делает |
+| Flag | Meaning |
 | --- | --- |
-| *(без флагов)* | debug-APK, обе архитектуры (armeabi-v7a + arm64-v8a) |
-| `--release` | release-сборка (для установки нужен свой ключ подписи) |
-| `--arch=arm64` | только arm64-v8a — примерно в 2 раза быстрее и меньше APK |
-| `--arch=armv7` | только armeabi-v7a (старые устройства) |
-| `--skip-build` | только установить/починить инструментарий |
-| `--force` | перекачать и переустановить всё заново |
-| `--nopause` | не ждать нажатия клавиши в конце (для CI) |
-
-Примеры:
+| *(none)* | debug APK, both architectures (armeabi-v7a + arm64-v8a) |
+| `--release` | release build (needs your own signing key, see below) |
+| `--arch=arm64` | arm64-v8a only — about twice as fast, smaller APK |
+| `--arch=armv7` | armeabi-v7a only (older devices) |
+| `--skip-build` | install / repair the toolchain only |
+| `--force` | re-download and reinstall everything |
+| `--nopause` | never wait for a key press (CI friendly) |
 
 ```bat
 install-and-build.cmd --arch=arm64
@@ -82,18 +91,18 @@ install-and-build.cmd --skip-build
 
 ---
 
-## Что устанавливается и куда
+## What gets installed
 
-Всё ставится в `%LOCALAPPDATA%\FunkinAndroidToolchain`, ничего не пишется за
-пределы профиля пользователя, админ не нужен.
+Everything goes into `%LOCALAPPDATA%\FunkinAndroidToolchain`; nothing is written
+outside your user profile and no administrator rights are needed.
 
-| Компонент | Версия |
+| Component | Version |
 | --- | --- |
 | Haxe + haxelib | 4.3.7 |
-| Neko (нужен haxelib и run-скриптам Lime) | 2.4.1 |
-| JDK (ставится только если нет JDK 17+) | Eclipse Temurin 21 |
+| Neko (needed by haxelib and Lime run scripts) | 2.4.1 |
+| JDK (installed only when no JDK 17+ is present) | Eclipse Temurin 21 |
 | Android cmdline-tools / platform-tools | latest |
-| Android build-tools | 34.0.0 и 35.0.0 |
+| Android build-tools | 34.0.0 and 35.0.0 |
 | Android platform | android-35 |
 | Android NDK | r21e (21.4.7075529) |
 | hxcpp | 4.3.2 |
@@ -105,98 +114,127 @@ install-and-build.cmd --skip-build
 | hscript | 2.5.0 |
 | polymod | 1.4.3 |
 
-Параметры APK: `com.ninjamuffin99.funkin`, versionName `0.2.7.1`, minSdk 21
-(Android 5.0), targetSdk 35, ABI `arm64-v8a` + `armeabi-v7a`, размер ~174 МБ.
+APK parameters: `com.ninjamuffin99.funkin`, versionName `0.2.7.1`, minSdk 21
+(Android 5.0), targetSdk 35, ABI `arm64-v8a` + `armeabi-v7a`, ~170 MB.
 
 ---
 
-## Патчи flixel 4.8.1 (делаются автоматически)
+## flixel 4.8.1 patches (applied automatically)
 
-Без них проект не собирается современным Haxe. Все изменённые файлы имеют
-резервные копии рядом (`.orig`, `.compatbak`).
+Without them the project does not compile with modern Haxe. Every modified file
+has a backup next to it (`.orig`, `.compatbak`).
 
-**1. `flixel/ui/FlxVirtualPad.hx`** — взят из папки `OPENME!` этого репозитория:
-экранные кнопки увеличены в 3 раза под современные телефоны, добавлены режимы
-`RIGHT_FULL` / `ALTER_FULL`.
+**1. `flixel/ui/FlxVirtualPad.hx`** — taken from the `OPENME!` folder of this
+repository: on-screen buttons are enlarged 3x for modern phones, plus the
+`RIGHT_FULL` / `ALTER_FULL` layouts.
 
-**2. `flixel/group/FlxGroup.hx` и `flixel/system/frontEnds/PluginFrontEnd.hx`** —
-четыре строки вида `x is ObjectClass` / `x is ClassType` заменены на
-`Std.isOfType(x, ...)`. В Haxe 4.2+ оператор `is` с переменной запрещён, из-за
-чего flixel 4.8.1 не компилируется («Type not found : ObjectClass»).
+**2. `flixel/group/FlxGroup.hx` and `flixel/system/frontEnds/PluginFrontEnd.hx`** —
+four `x is ObjectClass` / `x is ClassType` lines are rewritten to
+`Std.isOfType(x, ...)`. Haxe 4.2+ forbids `is` with a variable, which is why
+flixel 4.8.1 fails with "Type not found : ObjectClass".
 
-Откатить второй патч:
+**3. `flixel/math/FlxPoint.hx` and `flixel/math/FlxRect.hx`** — the pool fields
+get an explicit type:
 
-```bat
-copy /y "%LOCALAPPDATA%\FunkinAndroidToolchain\haxelib\flixel\4,8,1\flixel\group\FlxGroup.hx.compatbak" ^
-        "%LOCALAPPDATA%\FunkinAndroidToolchain\haxelib\flixel\4,8,1\flixel\group\FlxGroup.hx"
+```haxe
+static var _pool:FlxPool<FlxPoint> = new FlxPool<FlxPoint>(FlxPoint);
 ```
 
+Without the annotation Haxe 4.3 mis-infers the type of `_pool` in **release**
+builds and fails with "has no field putUnsafe". Debug builds are not affected.
+
+Revert a patch:
+
+```bat
+copy /y "%LOCALAPPDATA%\FunkinAndroidToolchain\haxelib\flixel\4,8,1\flixel\math\FlxPoint.hx.compatbak" ^
+        "%LOCALAPPDATA%\FunkinAndroidToolchain\haxelib\flixel\4,8,1\flixel\math\FlxPoint.hx"
+```
+
+### Signing a release build
+
+```bat
+"%JAVA_HOME%\bin\keytool" -genkeypair -v -keystore funkin.keystore ^
+   -alias funkin -keyalg RSA -keysize 2048 -validity 10000
+```
+
+Create `export\release\android\bin\signing.properties`:
+
+```properties
+KEY_STORE=C:/path/funkin.keystore
+KEY_STORE_PASSWORD=yourpassword
+KEY_ALIAS=funkin
+KEY_ALIAS_PASSWORD=yourpassword
+```
+
+Then run `install-and-build.cmd --release`.
+
 ---
 
-## Ручная сборка / переиспользование инструментария
+## Manual build / reusing the toolchain
 
-После установки появляется `%LOCALAPPDATA%\FunkinAndroidToolchain\env.cmd`:
+After installation a helper script appears:
+`%LOCALAPPDATA%\FunkinAndroidToolchain\env.cmd`
 
 ```bat
 call "%LOCALAPPDATA%\FunkinAndroidToolchain\env.cmd"
-cd /d <путь к проекту>
+cd /d <project path>
 haxelib run lime build android -debug
 ```
 
-Полезные команды Lime:
+Useful Lime commands:
 
-| Команда | Что делает |
+| Command | Purpose |
 | --- | --- |
 | `haxelib run lime build android -debug` | debug APK |
 | `haxelib run lime build android` | release APK |
-| `haxelib run lime build android -arm64` | только arm64 |
-| `haxelib run lime build android -clean` | полная пересборка |
-| `haxelib run lime test android` | собрать, установить и запустить на телефоне |
+| `haxelib run lime build android -arm64` | arm64 only |
+| `haxelib run lime build android -clean` | full rebuild |
+| `haxelib run lime test android` | build, install and launch on the phone |
 
 ---
 
-## Если что-то пошло не так
+## Troubleshooting
 
-| Симптом | Решение |
+| Symptom | Fix |
 | --- | --- |
-| `Your project path contains non-ASCII characters` | Gradle не умеет русские буквы в пути. Установщик сам собирает через junction `...\FunkinAndroidToolchain\build`; если делаете вручную — перенесите проект в путь без кириллицы |
-| `packageDebug FAILED` + `java_pid*.hprof` | не хватило памяти Gradle. Нужно `org.gradle.jvmargs=-Xmx4096m` в `%USERPROFILE%\.gradle\gradle.properties` (установщик это пишет) и `gradlew --stop` |
-| `Type not found : ObjectClass` | пропал патч flixel (см. выше) — верните файлы из `.compatbak` |
-| `haxelib.exe` молча падает (`0xC0000135`) | рядом с `haxelib.exe` нет `neko.dll` / `gcmt-dll.dll` / `*.ndll` — установщик копирует их сам |
-| `You must define ANDROID_SDK and ANDROID_NDK_ROOT` | выполните `haxelib run lime setup android` и укажите пути из `%LOCALAPPDATA%\FunkinAndroidToolchain` |
-| Ошибки NDK / `ndk-build` | проверьте `ANDROID_NDK_ROOT` — нужен именно NDK r21e |
-| Сборка идёт очень медленно | добавьте в исключения антивируса папку проекта, `%LOCALAPPDATA%\FunkinAndroidToolchain` и `%USERPROFILE%\haxelib` |
+| `Your project path contains non-ASCII characters` | Gradle rejects non-ASCII paths. The installer builds through a junction (`...\FunkinAndroidToolchain\build`); if you build manually, move the project to an ASCII path |
+| `packageDebug FAILED` + `java_pid*.hprof` | the Gradle daemon ran out of memory. Needs `org.gradle.jvmargs=-Xmx4096m` in `%USERPROFILE%\.gradle\gradle.properties` (the installer writes it) and `gradlew --stop` |
+| `Type not found : ObjectClass` | the flixel patch is missing — restore the files from `.compatbak` |
+| `has no field putUnsafe` on release builds | the `_pool` type annotation patch is missing (see above) |
+| `haxelib.exe` dies silently (`0xC0000135`) | `neko.dll` / `gcmt-dll.dll` / `*.ndll` are missing next to `haxelib.exe` — the installer copies them |
+| `You must define ANDROID_SDK and ANDROID_NDK_ROOT` | run `haxelib run lime setup android` and point it at `%LOCALAPPDATA%\FunkinAndroidToolchain` |
+| NDK / `ndk-build` errors | check `ANDROID_NDK_ROOT` — NDK r21e is required |
+| Build is extremely slow | exclude the project folder, `%LOCALAPPDATA%\FunkinAndroidToolchain` and `%USERPROFILE%\haxelib` from antivirus scanning |
 
-Логи установщика: `%LOCALAPPDATA%\FunkinAndroidToolchain\logs\`.
-
----
-
-## Структура репозитория
-
-```
-install-and-build.cmd   установщик инструментария и сборщик APK (Windows)
-Project.xml             конфигурация Lime/OpenFL проекта
-source/                 исходники игры на Haxe
-assets/                 ассеты игры (музыка, графика, чарты)
-art/                    исходники графики (Flash .fla и т.п.)
-OPENME!/                патч flixel 4.8.1 с увеличенным виртуальным геймпадом
-example_mods/           примеры модов (polymod)
-docs/, .github/         прочее
-```
-
-Папка `export/` (результаты сборки) в репозиторий не попадает — она в
-`.gitignore`.
+Installer logs: `%LOCALAPPDATA%\FunkinAndroidToolchain\logs\`.
 
 ---
 
-## Лицензия и кредиты
+## Repository structure
 
-Код распространяется по **Apache License 2.0** — см. [LICENSE](LICENSE).
-Ассеты и персонажи Friday Night Funkin' принадлежат их авторам; репозиторий не
-даёт на них никаких прав.
+```
+install-and-build.cmd   toolchain installer + APK builder (Windows)
+Project.xml             Lime/OpenFL project configuration
+source/                 Haxe sources of the game
+assets/                 game assets (music, graphics, charts)
+art/                    graphics sources (Flash .fla etc.)
+OPENME!/                patched flixel 4.8.1 virtual pad assets
+example_mods/           example mods (polymod)
+docs/, .github/         misc
+```
+
+The `export/` folder (build results) is not tracked — it is in `.gitignore`.
+
+---
+
+## License and credits
+
+Code is distributed under the **Apache License 2.0** — see [LICENSE](LICENSE).
+Friday Night Funkin' assets and characters belong to their authors; this
+repository grants no rights to them.
 
 * **Friday Night Funkin'** — [ninjamuffin99](https://twitter.com/ninja_muffin99)
-  (код), PhantomArcade3K и Evilsk8r (арт), Kawaisprite (музыка). Оригинал:
-  [ninjamuffin99/Funkin](https://github.com/ninjamuffin99/Funkin)
-* **Android-порт 0.2.7.1.5** — [luckydog7/Funkin-android](https://github.com/luckydog7/Funkin-android)
-* **Скрипт автоматической сборки и настройка тулчейна** — этот репозиторий
+  (code), PhantomArcade3K and Evilsk8r (art), Kawaisprite (music).
+  Original: [ninjamuffin99/Funkin](https://github.com/ninjamuffin99/Funkin)
+* **Android port 0.2.7.1.5** — [luckydog7/Funkin-android](https://github.com/luckydog7/Funkin-android)
+* **Automatic build script and toolchain setup** — this repository

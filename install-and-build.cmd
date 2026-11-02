@@ -343,6 +343,14 @@ if exist "%FLXG%" if not exist "%FLXG%.compatbak" copy /y "%FLXG%" "%FLXG%.compa
 if exist "%FLXP%" if not exist "%FLXP%.compatbak" copy /y "%FLXP%" "%FLXP%.compatbak" >nul
 powershell -NoProfile -ExecutionPolicy Bypass -Command "$f=$env:FLXG; if(Test-Path $f){$c=[IO.File]::ReadAllText($f); if($c.Contains('is ObjectClass')){$c=$c.Replace('(basic is ObjectClass)','Std.isOfType(basic, ObjectClass)'); [IO.File]::WriteAllText($f,$c); '  patched FlxGroup.hx'} else {'  FlxGroup.hx already patched'}}"
 powershell -NoProfile -ExecutionPolicy Bypass -Command "$f=$env:FLXP; if(Test-Path $f){$c=[IO.File]::ReadAllText($f); if($c.Contains('is ClassType')){$c=$c.Replace('(plugin is ClassType)','Std.isOfType(plugin, ClassType)').Replace('(list[i] is ClassType)','Std.isOfType(list[i], ClassType)'); [IO.File]::WriteAllText($f,$c); '  patched PluginFrontEnd.hx'} else {'  PluginFrontEnd.hx already patched'}}"
+rem Haxe 4.3 mis-infers the static pool type of FlxPoint/FlxRect in RELEASE
+rem builds ("has no field putUnsafe") - an explicit type annotation fixes it.
+set "FLXPT=%FLX%\flixel\math\FlxPoint.hx"
+set "FLXRT=%FLX%\flixel\math\FlxRect.hx"
+if exist "%FLXPT%" if not exist "%FLXPT%.compatbak" copy /y "%FLXPT%" "%FLXPT%.compatbak" >nul
+if exist "%FLXRT%" if not exist "%FLXRT%.compatbak" copy /y "%FLXRT%" "%FLXRT%.compatbak" >nul
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$f=$env:FLXPT; if(Test-Path $f){$c=[IO.File]::ReadAllText($f); if($c.Contains('static var _pool = new FlxPool<FlxPoint>(FlxPoint);')){$c=$c.Replace('static var _pool = new FlxPool<FlxPoint>(FlxPoint);','static var _pool:FlxPool<FlxPoint> = new FlxPool<FlxPoint>(FlxPoint);'); [IO.File]::WriteAllText($f,$c); '  patched FlxPoint.hx'} else {'  FlxPoint.hx already patched'}}"
+powershell -NoProfile -ExecutionPolicy Bypass -Command "$f=$env:FLXRT; if(Test-Path $f){$c=[IO.File]::ReadAllText($f); if($c.Contains('static var _pool = new FlxPool<FlxRect>(FlxRect);')){$c=$c.Replace('static var _pool = new FlxPool<FlxRect>(FlxRect);','static var _pool:FlxPool<FlxRect> = new FlxPool<FlxRect>(FlxRect);'); [IO.File]::WriteAllText($f,$c); '  patched FlxRect.hx'} else {'  FlxRect.hx already patched'}}"
 echo.
 
 rem ------------------------- 8. build path ----------------------------
